@@ -26,8 +26,6 @@ import {
 } from "@floating-ui/react";
 import * as React from "react";
 
-// --- Contextos ---
-
 interface MenuContextValue {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
@@ -233,12 +231,16 @@ const MenuTrigger = React.forwardRef<
 MenuTrigger.displayName = "Menu.Trigger";
 
 const MenuPopover = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLProps<HTMLDivElement>
+  HTMLUListElement,
+  React.HTMLProps<HTMLUListElement>
 >(({ children, style, ...props }, forwardedRef) => {
   const menu = useMenuContext();
 
-  if (!menu.isOpen) return null;
+  const popoverRefs = useMergeRefs([menu.refs.setFloating, forwardedRef]);
+
+  if (!menu.isOpen) {
+    return null;
+  }
 
   return (
     <FloatingPortal>
@@ -249,9 +251,9 @@ const MenuPopover = React.forwardRef<
         returnFocus={!menu.isNested}
       >
         <ul
-          ref={useMergeRefs([menu.refs.setFloating, forwardedRef])}
+          ref={popoverRefs}
           style={{ ...menu.floatingStyles, ...style }}
-          className="Menu" // Classe CSS original
+          className="Menu"
           {...menu.getFloatingProps(props)}
         >
           <FloatingList
